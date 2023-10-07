@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { TruckConsumption, areInstancesOfTruckConsumption } from '../util/truckData';
-import './App.css';
 import { Consumption } from './Consumption';
 import { TruckForm } from './TruckForm';
 
