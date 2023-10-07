@@ -1,4 +1,15 @@
-import { AppBar, Button, Container, CssBaseline, Grid, Paper, ThemeProvider, Toolbar, Typography, createTheme } from '@mui/material';
+import {
+  AppBar,
+  Button,
+  Container,
+  CssBaseline,
+  Grid,
+  Paper,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+  createTheme
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { TruckConsumption, areInstancesOfTruckConsumption } from '../util/truckData';
 import './App.css';
@@ -65,7 +76,10 @@ function App() {
         <Grid container spacing={2}>
           <Grid item xs={12} lg={4}>
             <Paper elevation={2} sx={{ p: 4 }}>
-              <TruckForm trucksConsumption={trucksConsumption} setTrucksConsumption={setTrucksConsumption} />
+              <TruckForm
+                trucksConsumption={trucksConsumption}
+                setTrucksConsumption={setTrucksConsumption}
+              />
             </Paper>
           </Grid>
           <Grid item xs={12} lg={8}>

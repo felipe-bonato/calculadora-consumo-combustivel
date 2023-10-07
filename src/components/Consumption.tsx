@@ -5,7 +5,7 @@ import { TruckConsumption } from "../util/truckData"
 export const Consumption = ({ trucksConsumption }: { trucksConsumption: TruckConsumption[] }) => {
 
 	return (
-		<Table size="small" padding="checkbox">
+		<Table size="small" padding="normal">
 			<TableHead>
 				<TableRow>
 					<TableCell>Placa</TableCell>
@@ -26,11 +26,10 @@ export const Consumption = ({ trucksConsumption }: { trucksConsumption: TruckCon
 						<TableCell>{trucksConsumption.truck.maxLoad}</TableCell>
 						<TableCell>{trucksConsumption.truck.avgComsumption}</TableCell>
 						<TableCell>{trucksConsumption.truck.distanceTraveled}</TableCell>
-						<TableCell>{trucksConsumption.consumption}</TableCell>
+						<TableCell>{trucksConsumption.consumption.toPrecision(3)}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
 		</Table >
 	)
-	//return <div>Consumo foi de: {trucksConsumption.at(-1)?.consumption} l/t/km</div>
 }

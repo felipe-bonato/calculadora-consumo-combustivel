@@ -1,10 +1,10 @@
 export interface TruckData {
 	licensePlate: string,
 	model: string,
-	fuelTankCapacity: number,
-	maxLoad: number,
-	avgComsumption: number,
-	distanceTraveled: number
+	fuelTankCapacity: number | undefined,
+	maxLoad: number | undefined,
+	avgComsumption: number | undefined,
+	distanceTraveled: number | undefined
 
 }
 
@@ -52,5 +52,18 @@ export const isInstanceOfTruckConsumption = (obj: any): boolean => {
 export const areInstancesOfTruckConsumption = (obj: any): boolean => {
 	return typeof obj === "object"
 		&& Array.isArray(obj)
-		&& ((obj as Array<any>).length === 0 || (obj as Array<any>).every(isInstanceOfTruckConsumption))
+		&& ((obj as Array<any>).length === 0
+			|| (obj as Array<any>).every(isInstanceOfTruckConsumption))
+}
+
+export const isTruckDataValid = (truck: TruckData): boolean => {
+	return truck.fuelTankCapacity !== undefined &&
+		truck.maxLoad !== undefined &&
+		truck.avgComsumption !== undefined &&
+		truck.distanceTraveled !== undefined
+}
+
+export const isValidLicensePlates = (licensePlate: string): boolean => {
+	return !/^[A-Za-z]{3}[\d]{4}$/i.test(licensePlate) // Old plates: ABC1234
+		&& !/^[A-Za-z]{3}[\d][A-Za-z][\d]{2}$/i.test(licensePlate) // Mercosul plates: ABC1D34
 }
