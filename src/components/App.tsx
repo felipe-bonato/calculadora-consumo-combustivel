@@ -29,28 +29,48 @@ const intebrasTheme = createTheme({
 
 
 function App() {
-  const [consumption, setConsumption] = useState(0);
+  const [trucksConsumption, setTrucksConsumption] = useState<TruckConsumption[]>([])
+
+  useEffect(() => {
+
+    const storedTrucks = localStorage.getItem("trucksConsumption")
+    if (storedTrucks === null) {
+      return;
+    }
+
+    const parsedTrucks = JSON.parse(storedTrucks)
+    if (!areInstancesOfTruckConsumption(parsedTrucks)) {
+      return
+    }
+
+    const storedTrucksConsumption = parsedTrucks as TruckConsumption[]
+
+    setTrucksConsumption(storedTrucksConsumption)
+  }, [])
+
   return (
     <ThemeProvider theme={intebrasTheme}>
       <CssBaseline />
 
       <AppBar elevation={4}>
-            <Toolbar>
+        <Toolbar>
           <img src="logo_intelbras_branco_cmyk.svg" alt='Intelbras' height="64"></img>
-              <Typography>
+          <Typography>
             Calculadora de consumo de combustivel
-              </Typography>
-            </Toolbar>
-          </AppBar>
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
       <Container sx={{ mt: 12 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} lg={4}>
             <Paper elevation={2} sx={{ p: 4 }}>
+              <TruckForm trucksConsumption={trucksConsumption} setTrucksConsumption={setTrucksConsumption} />
             </Paper>
           </Grid>
           <Grid item xs={12} lg={8}>
             <Paper elevation={2} sx={{ p: 4 }}>
+              <Consumption trucksConsumption={trucksConsumption} />
               <Button variant="text" onClick={() => {
                 localStorage.clear()
                 setTrucksConsumption([])

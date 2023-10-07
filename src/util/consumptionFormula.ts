@@ -1,4 +1,3 @@
-
 export const calculateConsumption = (
 	maxLoadInTons: number,
 	avgConsumptionInLitersPerHundredKm: number,

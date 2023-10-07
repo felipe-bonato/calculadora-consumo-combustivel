@@ -33,7 +33,7 @@ const validate = (values: TruckData) => {
 	return errors
 }
 
-export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.SetStateAction<number>> }) => {
+export const TruckForm = ({ trucksConsumption, setTrucksConsumption }: { trucksConsumption: TruckConsumption[], setTrucksConsumption: Dispatch<SetStateAction<TruckConsumption[]>> }) => {
 	const formik = useFormik({
 		initialValues: {
 			licensePlate: '',
@@ -44,6 +44,19 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 			distanceTraveled: 0
 		},
 		validate: validate,
+		onSubmit: (truck: TruckData, { setSubmitting }: FormikHelpers<TruckData>) => {
+			if (trucksConsumption.length === 0 || !isEquals(truck, trucksConsumption[0].truck)) {
+				const truckLastCalculated = {
+					truck: truck,
+					consumption: calculateConsumption(
+						truck.maxLoad,
+						truck.avgComsumption,
+						truck.distanceTraveled)
+				}
+				const newTrucksConsumption = [truckLastCalculated, ...trucksConsumption]
+				setTrucksConsumption(newTrucksConsumption)
+				localStorage.setItem("trucksConsumption", JSON.stringify(newTrucksConsumption))
+			}
 		}
 	})
 
