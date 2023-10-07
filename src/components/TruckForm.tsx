@@ -1,16 +1,36 @@
 import { Button, InputAdornment, Stack, TextField } from "@mui/material";
-import { useFormik } from "formik";
-import { Dispatch } from "react";
-import { calculateConsumption } from "./consumptionFormula";
+import { FormikHelpers, useFormik } from "formik";
+import { Dispatch, SetStateAction } from "react";
+import { calculateConsumption } from "../util/consumptionFormula";
+import { TruckConsumption, TruckData, TruckDataErrors, isEquals } from "../util/truckData";
 
-interface TruckData {
-	licensePlate: string,
-	model: string,
-	fuelTankCapacity: number,
-	maxLoad: number,
-	avgComsumption: number,
-	distanceTraveled: number
+const validate = (values: TruckData) => {
+	const errors: TruckDataErrors = {} as TruckDataErrors
 
+	if (!/^[A-Za-z]{3}[\d]{4}$/i.test(values.licensePlate)
+		&& !/^[A-Za-z]{3}[\d][A-Za-z][\d]{2}$/i.test(values.licensePlate)
+	) {
+		errors.licensePlate = `A Placa "${values.licensePlate}" é invalida. Formatos aceitos são "ABC1234" ou "ABC1D23."`
+	} else if (values.model.length < 1) {
+		errors.model = "Campo obrigatório."
+	} else if (!values.fuelTankCapacity) {
+		errors.fuelTankCapacity = "Campo obrigatório."
+	} else if (values.fuelTankCapacity <= 0) {
+		errors.fuelTankCapacity = `Valor "${values.fuelTankCapacity}" é invalido. Valores aceitos são igual ou maiores que 1.`
+	} else if (!values.maxLoad) {
+		errors.maxLoad = "Campo obrigatório."
+	} else if (values.maxLoad <= 0) {
+		errors.maxLoad = `Valor "${values.maxLoad}" é invalido. Valores aceitos são maiores que 0.`
+	} else if (!values.avgComsumption) {
+		errors.avgComsumption = "Campo obrigatório."
+	} else if (values.avgComsumption <= 0) {
+		errors.avgComsumption = `Valor "${values.avgComsumption}" é invalido. Valores aceitos são maiores que 0.`
+	} else if (!values.distanceTraveled) {
+		errors.distanceTraveled = "Campo obrigatório."
+	} else if (values.distanceTraveled <= 0) {
+		errors.distanceTraveled = `Valor "${values.distanceTraveled}" é invalido. Valores aceitos são maiores que 0.`
+	}
+	return errors
 }
 
 export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.SetStateAction<number>> }) => {
@@ -23,16 +43,7 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 			avgComsumption: 0,
 			distanceTraveled: 0
 		},
-		onSubmit: (
-			values: TruckData,
-		) => {
-			const consumption = calculateConsumption(
-				values.maxLoad,
-				values.avgComsumption,
-				values.distanceTraveled
-			)
-			setConsumption(consumption)
-			//alert(JSON.stringify(values, null, 2));
+		validate: validate,
 		}
 	})
 
@@ -70,6 +81,7 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 						id="fuelTankCapacity"
 						label="Capacidade do Tanque"
 						name="fuelTankCapacity"
+						type="number"
 						InputProps={{ endAdornment: <InputAdornment position="end">l</InputAdornment> }}
 						value={formik.values.fuelTankCapacity}
 						onChange={formik.handleChange}
@@ -82,6 +94,7 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 						id="maxLoad"
 						label="Carga Máxima"
 						name="maxLoad"
+						type="number"
 						InputProps={{ endAdornment: <InputAdornment position="end">t</InputAdornment> }}
 						value={formik.values.maxLoad}
 						onChange={formik.handleChange}
@@ -94,6 +107,7 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 						id="avgComsumption"
 						label="Consumo Médio"
 						name="avgComsumption"
+						type="number"
 						InputProps={{ endAdornment: <InputAdornment position="end">l/100km</InputAdornment> }}
 						value={formik.values.avgComsumption}
 						onChange={formik.handleChange}
@@ -106,6 +120,7 @@ export const TruckForm = ({ setConsumption }: { setConsumption: Dispatch<React.S
 						id="distanceTraveled"
 						label="Distância Percorrida na Jornada"
 						name="distanceTraveled"
+						type="number"
 						InputProps={{ endAdornment: <InputAdornment position="end">km</InputAdornment> }}
 						value={formik.values.distanceTraveled}
 						onChange={formik.handleChange}
