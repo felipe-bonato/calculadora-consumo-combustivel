@@ -1,69 +1,38 @@
-import { Button, InputAdornment, Stack, TextField } from "@mui/material";
-import { Form, Formik, useFormikContext } from "formik";
-import { Dispatch, SetStateAction } from "react";
-import { calculateConsumption } from "../util/consumptionFormula";
+import { Button, InputAdornment, Stack, TextField } from "@mui/material"
+import { Form, Formik, useFormikContext } from "formik"
+import { Dispatch, SetStateAction } from "react"
+import { calculateConsumption } from "../util/consumptionFormula"
 import {
 	TruckConsumption,
 	TruckData,
-	TruckDataErrors,
 	isEquals,
 	isTruckDataValid,
-	isValidLicensePlates
-} from "../util/truckData";
-
-// Due to the requisites not stating any validation library, validation was hand-written
-const validate = (values: TruckData) => {
-	const errors: TruckDataErrors = {} as TruckDataErrors
-
-	if (isValidLicensePlates(values.licensePlate)) {
-		errors.licensePlate = `A Placa "${values.licensePlate}" é invalida.Formatos aceitos são "ABC1234" ou "ABC1D23."`
-	} else if (values.model.length < 1) {
-		errors.model = "Campo obrigatório."
-	} else if (!values.fuelTankCapacity) {
-		errors.fuelTankCapacity = "Campo obrigatório."
-	} else if (values.fuelTankCapacity <= 0) {
-		errors.fuelTankCapacity = `Valor "${values.fuelTankCapacity}" é invalido. Valores aceitos são igual ou maiores que 1.`
-	} else if (!values.maxLoad) {
-		errors.maxLoad = "Campo obrigatório."
-	} else if (values.maxLoad <= 0) {
-		errors.maxLoad = `Valor "${values.maxLoad}" é invalido. Valores aceitos são maiores que 0.`
-	} else if (!values.avgComsumption) {
-		errors.avgComsumption = "Campo obrigatório."
-	} else if (values.avgComsumption <= 0) {
-		errors.avgComsumption = `Valor "${values.avgComsumption}" é invalido. Valores aceitos são maiores que 0.`
-	} else if (!values.distanceTraveled) {
-		errors.distanceTraveled = "Campo obrigatório."
-	} else if (values.distanceTraveled <= 0) {
-		errors.distanceTraveled = `Valor "${values.distanceTraveled}" é invalido. Valores aceitos são maiores que 0.`
-	}
-
-	return errors
-}
+	truckTrim,
+	validateTruck
+} from "../util/truckData"
 
 
-const TruckTextField = (
-	{
-		id,
-		prettyName,
-		valueType = "text",
-		unit = undefined,
-	}: {
-		id: keyof TruckData,
-		prettyName: string,
-		valueType: "number" | "text",
-		unit: string | undefined,
-	}
-) => {
-	const formik = useFormikContext<TruckData>();
+
+const TruckTextField = ({
+	id,
+	prettyName,
+	valueType = "text",
+	unit = undefined,
+}: {
+	id: keyof TruckData,
+	prettyName: string,
+	valueType: "number" | "text",
+	unit?: string,
+}) => {
+	const formik = useFormikContext<TruckData>()
 	return <TextField
-		required
 		id={id}
 		label={prettyName}
 		name={id}
 		type={valueType}
-		InputProps={
-			unit ? { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }
-				: undefined
+		InputProps={unit ?
+			{ endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }
+			: undefined
 		}
 		value={formik.values[id]}
 		onChange={formik.handleChange}
@@ -73,10 +42,13 @@ const TruckTextField = (
 	/>
 }
 
+
+
 export const TruckForm = ({ trucksConsumption, setTrucksConsumption }: {
 	trucksConsumption: TruckConsumption[],
 	setTrucksConsumption: Dispatch<SetStateAction<TruckConsumption[]>>
 }) => {
+
 	const onSubmit = (truck: TruckData) => {
 		if ((
 			trucksConsumption.length === 0
@@ -84,7 +56,7 @@ export const TruckForm = ({ trucksConsumption, setTrucksConsumption }: {
 		) && isTruckDataValid(truck)
 		) {
 			const truckLastCalculated = {
-				truck: truck,
+				truck: truckTrim(truck),
 				consumption: calculateConsumption(
 					// We know that this MUST be of type number because the function
 					// `isTruckDataValid` checks for this. So we force this to be a number
@@ -103,17 +75,20 @@ export const TruckForm = ({ trucksConsumption, setTrucksConsumption }: {
 		<div>
 			<Formik
 				initialValues={{
-					licensePlate: '',
-					model: '',
-					fuelTankCapacity: undefined,
-					maxLoad: undefined,
-					avgComsumption: undefined,
-					distanceTraveled: undefined
+					licensePlate: "",
+					model: "",
+					// The `as unknown as number` is needed because of this react error:
+					// https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
+					// The only way that I found to have empty initial values and not cause the
+					// above error is this. It's ugly, but I haven't found a better solution.
+					fuelTankCapacity: "" as unknown as number,
+					maxLoad: "" as unknown as number,
+					avgComsumption: "" as unknown as number,
+					distanceTraveled: "" as unknown as number
 				}}
-				validate={validate}
+				validate={validateTruck}
 				onSubmit={onSubmit}
 			>
-
 				<Form>
 					<Stack spacing={2}>
 						<TruckTextField
@@ -130,31 +105,33 @@ export const TruckForm = ({ trucksConsumption, setTrucksConsumption }: {
 						/>
 						<TruckTextField
 							id="fuelTankCapacity"
-							prettyName="Capacidade do Tanque"
+							prettyName="Capacidade do tanque"
 							valueType="number"
 							unit="l"
 						/>
 						<TruckTextField
 							id="maxLoad"
-							prettyName="Carga Máxima"
+							prettyName="Carga máxima"
 							valueType="number"
 							unit="t"
 						/>
 						<TruckTextField
 							id="avgComsumption"
-							prettyName="Consumo Médio"
+							prettyName="Consumo médio"
 							valueType="number"
 							unit="l/100km"
 						/>
 						<TruckTextField
 							id="distanceTraveled"
-							prettyName="Distância Percorrida na Jornada"
+							prettyName="Distância percorrida na jornada"
 							valueType="number"
 							unit="km"
 						/>
+
 						<Button type="submit" variant="contained">
 							Calcular
 						</Button>
+
 					</Stack>
 				</Form>
 			</Formik>
