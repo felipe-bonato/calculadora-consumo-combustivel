@@ -1,11 +1,11 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Intebras Calculadora Consumo",
+  "name": "Intelbras | Calculadora de Consumo de Combustivel",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "https://brandbook.intelbras.com/wp-content/uploads/2019/01/favicon.png",
+      "type": "image/png",
+      "sizes": "64x64 32x32 24x24 16x16"
     },
     {
       "src": "logo192.png",
