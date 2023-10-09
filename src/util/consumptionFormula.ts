@@ -4,10 +4,10 @@ export const calculateConsumption = (
 	avgConsumptionInLitersPerHundredKm: number,
 	distanceTraveledInKm: number,
 ) => {
-	const maxLoadInKg = maxLoadInTons * 1000
-	const avgConsumptionInLitersPerKm = avgConsumptionInLitersPerHundredKm / 100
+	const avgConsumptionInLiterPerKm = avgConsumptionInLitersPerHundredKm / 100
 
-	const loadPerDistanceInKgPerKm = maxLoadInKg / distanceTraveledInKm
-	const avgConsumptionPerLoadPerDistanceInLitersPerTonPerKm = avgConsumptionInLitersPerKm / loadPerDistanceInKgPerKm
+	const avgLoadPerDistanceInKgPerKm = maxLoadInTons / (distanceTraveledInKm * 0.001)
+	const avgConsumptionPerLoadPerDistanceInLitersPerTonPerKm = (avgConsumptionInLiterPerKm * distanceTraveledInKm)
+		/ (avgLoadPerDistanceInKgPerKm * 1000)
 	return avgConsumptionPerLoadPerDistanceInLitersPerTonPerKm
 }
